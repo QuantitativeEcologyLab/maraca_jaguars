@@ -1,3 +1,4 @@
+#Import the packages
 library(ggplot2)
 library(ggspatial)
 library(tidyterra)
@@ -5,6 +6,7 @@ library(terra)
 library(sf)
 library(ctmm)
 library(ggpubr)
+library(mgcv)
 
 #-------------------------------------------------------------
 # Data import and pre-processesing
@@ -103,10 +105,53 @@ Netuno_PDF <- project(rast(raster(AKDEs$Netuno, DF = "PMF")), maraca_land)
 # Panel A - Tracking data
 #-------------------------------------------------------------
 
+crs_wintri <- "+proj=wintri +datum=WGS84 +no_defs +over"
 
-A <-
+#Reproject and process the HFI data
+world_sf <- st_as_sf(rworldmap::getMap(resolution = "low"))
+brasil_sf <- subset(world_sf, SOVEREIGNT == "Brazil")
+world <- makeValid(vect(lwgeom::st_transform_proj(world_sf, crs = crs_wintri)))
+brasil <- vect(lwgeom::st_transform_proj(brasil_sf, crs = crs_wintri))
+
+library(rnaturalearth)
+library(rnaturalearthdata)
+world <- ne_countries(scale = "medium", returnclass = "sv")
+world <- project(world, "+proj=moll")
+brasil <- world[world$name == "Brazil",]
+
+bras_inset <-
+  ggplot() +
+  
+  geom_spatvector(data = world) +
+    geom_spatvector(data = brasil, col = "black", size = 0.1, fill = "#009440") +
+
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        legend.position = "top",
+        #legend.position.inside = c(0.68,0.82),
+        legend.title = element_text(size=8, family = "sans", face = "bold", hjust = 0.5),
+        legend.text = element_text(size=6, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.2, 'cm'),
+        legend.spacing.y = unit(0.1, 'cm'),
+        plot.title = element_text(hjust = .01, vjust = -6, size = 14, family = "sans", face = "bold"),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x  = element_blank(),
+        axis.ticks = element_blank(),
+        strip.background=element_blank(),
+        plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm")) +
+    coord_sf(xlim = c(-8200000, -3300000), ylim = c(-4500000, 850000), expand = FALSE)
+
+
+
+fig <-
 ggplot() +
-  ggtitle("A") +
   geom_spatraster(data = maraca_land, maxcell = 5e+07,
                   alpha = 0.7, aes(fill = class)) +
   
@@ -139,7 +184,7 @@ ggplot() +
         legend.background = element_rect(fill = "transparent"),
         legend.key.size = unit(0.2, 'cm'),
         legend.spacing.y = unit(0.1, 'cm'),
-        plot.title = element_text(hjust = .01, vjust = -6, size = 12, family = "sans", face = "bold"),
+        plot.title = element_text(hjust = .01, vjust = -6, size = 14, family = "sans", face = "bold"),
         axis.title.y = element_blank(),
         axis.title.x = element_blank(),
         axis.text.y = element_blank(),
@@ -159,14 +204,29 @@ annotation_scale(height = unit(0.010, "npc"),
                  location = "tr")
 
 
+#Save the figures
+ggsave(bras_inset,
+       width = 6.86*1.5, height = 6*1.5, units = "in",
+       dpi = 600,
+       bg = "transparent",
+       file="figures/data_figure_inset.png")
+
+
+#Save the figures
+ggsave(fig,
+       width = 6.86*1.5, height = 6*1.5, units = "in",
+       dpi = 600,
+       bg = "transparent",
+       file="figures/data_figure.png")
+
 
 #-------------------------------------------------------------
-# Panel B - Home ranges
+# Panel A - Home ranges
 #-------------------------------------------------------------
 
-B <- 
+A <- 
 ggplot() +
-  ggtitle("B") +
+  ggtitle("A") +
   geom_spatraster(data = maraca_land, maxcell = 5e+07,
                   alpha = 0.7, aes(fill = class)) +
   scale_fill_manual(breaks = c("Forest","Mangrove","Wetland","Grassland","Water","Agriculture"),
@@ -211,14 +271,24 @@ ggplot() +
         legend.background = element_rect(fill = "transparent"),
         legend.key.size = unit(0.2, 'cm'),
         legend.spacing.y = unit(0.1, 'cm'),
-        plot.title = element_text(hjust = .01, vjust = -4, size = 12, family = "sans", face = "bold"),
+        plot.title = element_text(hjust = .01, vjust = -4, size = 14, family = "sans", face = "bold"),
         axis.title.y = element_blank(),
         axis.title.x = element_blank(),
         axis.text.y = element_blank(),
         axis.text.x  = element_blank(),
         axis.ticks = element_blank(),
         strip.background=element_blank(),
-        plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm"))
+        plot.margin = unit(c(0.2,0.2,0.2,0.2), "cm")) +
+  annotation_scale(height = unit(0.010, "npc"),
+                   width_hint = 0.4,
+                   line_width = 0.2,
+                   pad_x = unit(0.07, "npc"),
+                   pad_y = unit(0.07, "npc"),
+                   text_pad = unit(0.01, "npc"),
+                   text_cex = .5,
+                   text_family = "sans",
+                   text_face = "bold",
+                   location = "tr")
 
 
 # TOP <-
@@ -246,26 +316,26 @@ TOP <- ggarrange(A,B,
 #-------------------------------------------------------------
 
 #Generate the figure
-C <-
+B <-
   ggplot(data = meta_data, aes(x = sex,
                                y = hr_est*1e-6,
                                col = sex,
                                fill = sex,
                                alpha = 0.5)) +
-  ggtitle("C") +
+  ggtitle("B") +
   geom_boxplot(size = 0.1, outlier.size = 0.2, outlier.shape = 16, outlier.alpha = 0) +
-  geom_jitter(size = 0.5, shape = 16, position=position_jitter(height=0, width=0.1)) +
+  geom_jitter(size = 1, shape = 16, position=position_jitter(height=0, width=0.1)) +
   scale_fill_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   scale_colour_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
-  ylab(expression(bold(Home~range~size~(km^2))))+
+  ylab(expression(bold(Home-range~size~(km^2))))+
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.y = element_text(size=10, family = "sans", face = "bold"),
         axis.title.x = element_blank(),
-        axis.text.y = element_text(size=6, family = "sans"),
-        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
-        plot.title = element_text(hjust = -0.05, size = 12, family = "sans", face = "bold"),
+        axis.text.y = element_text(size=8, family = "sans"),
+        axis.text.x  = element_text(size=10, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 14, family = "sans", face = "bold"),
         #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
         strip.background = element_blank(),
         strip.text.x = element_blank(),
@@ -282,16 +352,16 @@ C <-
 
 
 #-------------------------------------------------------------
-# Panel D - Scatterplot of Home-range size vs weight
+# Panel C - Scatterplot of Home-range size vs weight
 #-------------------------------------------------------------
 
 #Generate the figure
-D <-
+C <-
   ggplot(data = meta_data, aes(x = weight,
                                y = hr_est*1e-6,
                                col = sex,
                                fill = sex)) +
-  ggtitle("D") +
+  ggtitle("C") +
   geom_point(size = 1, shape = 16) +
   geom_smooth(method = "gam",
               formula = y ~ x,
@@ -304,15 +374,15 @@ D <-
   scale_fill_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   scale_colour_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   xlab(expression(bold(Weight~(kg))))+
-  ylab(expression(bold(Home~range~size~(km^2))))+
+  ylab(expression(bold(Home-range~size~(km^2))))+
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
-        axis.title.x = element_text(size=8, family = "sans", face = "bold", color = "black"),
-        axis.text.y = element_text(size=6, family = "sans"),
-        axis.text.x  = element_text(size=6, family = "sans", face = "bold", color = "black"),
-        plot.title = element_text(hjust = -0.05, size = 12, family = "sans", face = "bold"),
+        axis.title.y = element_text(size=10, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=10, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=8, family = "sans"),
+        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 14, family = "sans", face = "bold"),
         #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
         strip.background = element_blank(),
         strip.text.x = element_blank(),
@@ -328,16 +398,16 @@ D <-
 
 
 #-------------------------------------------------------------
-# Panel E - Scatterplot of Home-range size vs weight
+# Panel D - Scatterplot of Home-range size vs weight
 #-------------------------------------------------------------
 
 #Generate the figure
-E <-
+D <-
   ggplot(data = meta_data, aes(x = age,
                                y = hr_est*1e-6,
                                col = sex,
                                fill = sex)) +
-  ggtitle("E") +
+  ggtitle("D") +
   geom_point(size = 1, shape = 16) +
   geom_smooth(method = "gam",
               formula = y ~ x,
@@ -350,15 +420,15 @@ E <-
   scale_fill_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   scale_colour_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   xlab(expression(bold(Age~(years))))+
-  ylab(expression(bold(Home~range~size~(km^2))))+
+  ylab(expression(bold(Home-range~size~(km^2))))+
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
-        axis.title.x = element_text(size=8, family = "sans", face = "bold", color = "black"),
-        axis.text.y = element_text(size=6, family = "sans"),
-        axis.text.x  = element_text(size=6, family = "sans", face = "bold", color = "black"),
-        plot.title = element_text(hjust = -0.05, size = 12, family = "sans", face = "bold"),
+        axis.title.y = element_text(size=10, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=10, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=8, family = "sans"),
+        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 14, family = "sans", face = "bold"),
         #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
         strip.background = element_blank(),
         strip.text.x = element_blank(),
@@ -375,7 +445,7 @@ E <-
 
 
 BOT <-
-  grid.arrange(C,D,E,
+  ggarrange(C,D,E,
                ncol=3,
                nrow=1)
 
@@ -395,3 +465,26 @@ ggsave(FIG,
        file="figures/hr_figure.png")
 
 
+
+
+
+
+right <-
+  ggarrange(B,C,D,
+            ncol=1,
+            nrow=3)
+
+
+FIG <-
+  ggarrange(A, right,
+            ncol=2,
+            nrow=1,
+            widths = c(1.25,0.75))
+
+
+#Save the figures
+ggsave(FIG,
+       width = 6.86*1.5, height = 5*1.5, units = "in",
+       dpi = 600,
+       bg = "transparent",
+       file="figures/hr_figure_2.png")

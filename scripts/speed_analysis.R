@@ -8,6 +8,8 @@ library(metafor)
 library(mgcv)
 library(lubridate)
 library(gratia)
+library(gridExtra)
+library(ggdist)
 
 source("scripts/data_import.R")
 
@@ -121,7 +123,7 @@ speed_fit <- gam(est ~ class + s(ID, bs = 're'),
                  data = moving_speeds,
                  method = "REML")
 
-summary(fit)
+summary(speed_fit)
 
 speed_null <- gam(est ~ 1 + s(ID, bs = 're'),
                   family = tw(link = "log"),
@@ -180,12 +182,43 @@ circadian_fit_no_sex <- bam(active ~ s(hr_min_numeric, bs = "cc") + s(ID, bs = '
 anova(circadian_fit_no_sex,circadian_fit, test = "Chisq")
 
 
-A <- 
-  draw(circadian_fit,
+
+
+A <-
+  ggplot(data = speed_df, aes(x = hr_min_numeric)) +
+  ggtitle("A") +
+  stat_slab(data = speed_df,
+            aes(x = hr_min_numeric, y = active, 
+                side = ifelse(active == 0, "top", "bottom"),
+                fill = active),
+            slab_type = "histogram",
+            scale = 0.4, breaks = 50, size = 1/2, col = NA) +
+  scale_fill_gradient(high = "#e07a5f", low = "#81b29a") +
+  
+  ylab(expression(bold(Active~vs.~resting)))+
+  xlab(expression(bold(Time~of~day~(Hrs))))+
+  
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=8, family = "sans", face = "bold"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=6, family = "sans"),
+        plot.title = element_text(hjust = -0.04, size = 8, family = "sans", face = "bold"),
+        legend.position = "none",
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA)) +
+  scale_x_continuous(limits = c(0, 24), expand = c(0,0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0,0.01))
+
+
+B <- 
+  gratia::draw(circadian_fit,
        select = "s(hr_min_numeric)",
        rug = F,
        caption = F) +
-  ggtitle("A") +
+  ggtitle("B") +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -208,12 +241,13 @@ A <-
         plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm")) +
   xlab("Time of day (Hrs)")
 
-B <- 
-  draw(circadian_fit,
+
+C <- 
+  gratia::draw(circadian_fit,
        select = "s(hr_min_numeric,sex)",
        rug = F,
        caption = F) +
-  ggtitle("B") +
+  ggtitle("C") +
   scale_colour_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   scale_fill_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   theme_bw() +
@@ -239,9 +273,9 @@ B <-
   xlab("Time of day (Hrs)")
   
 
-C <- 
+D <- 
   ggplot(speed_df, aes(x = hr_min, y = active, col = sex)) +
-  ggtitle("C") +
+  ggtitle("D") +
   stat_smooth(aes(fill = sex), method = "gam", formula = y ~ s(x, bs = "cc"), linewidth = 0.4, se = F) +
   stat_smooth(aes(fill = sex), method = "gam", formula = y ~ s(x, bs = "cc"), linewidth = 0.4, show.legend = FALSE) +
   scale_x_datetime(date_breaks = "3 hours", date_labels = "%H:00") +
@@ -276,11 +310,18 @@ C <-
        x = "Time of day")
 
 
-FIG <-
-  grid.arrange(A,B,C,
+
+BOT <-
+  grid.arrange(B,C,D,
                ncol=3,
                nrow=1,
                widths = c(1,1,1.1))
 
+FIG <-
+  grid.arrange(A, BOT,
+               ncol=1,
+               nrow=2)
+
+
 ggsave(FIG, filename = "figures/jags_circadian.png",
-       width = 6.86*1.5, height = 2*1.3, units = "in", dpi = 600)
+       width = 6.86*1.5, height = 4.5*1.3, units = "in", dpi = 600)

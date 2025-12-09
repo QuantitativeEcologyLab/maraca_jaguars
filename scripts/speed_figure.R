@@ -1,6 +1,8 @@
 library(ggplot2)
 library(ctmm)
 library(ggpubr)
+library(mgcv)
+library(fitdistrplus)
 
 #-------------------------------------------------------------
 # Data import and pre-processing
@@ -25,6 +27,7 @@ moving_speeds <- na.omit(speed_df[speed_df$active == 1,])
 # Panel A - Boxplot of speed size vs sex
 #-------------------------------------------------------------
 
+
 #Generate the figure
 A <-
   ggplot(data = meta_data, aes(x = sex,
@@ -36,14 +39,14 @@ A <-
   geom_jitter(size = 0.5, shape = 16, position=position_jitter(height=0, width=0.1)) +
   scale_fill_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   scale_colour_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
-  ylab(expression(bold(Mean~movement~speed~(km/day)))) +
+  ylab(expression(bold(Mean~speed~(km/day)))) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.title.y = element_text(size=6, family = "sans", face = "bold"),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
         axis.title.x = element_blank(),
-        axis.text.y = element_text(size=5, family = "sans"),
-        axis.text.x  = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
         plot.title = element_text(hjust = -0.05, size = 10, family = "sans", face = "bold"),
         #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
         strip.background = element_blank(),
@@ -83,14 +86,14 @@ B <-
   scale_fill_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   scale_colour_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   xlab(expression(bold(Weight~(kg))))+
-  ylab(expression(bold(Mean~movement~speed~(km/day)))) +
+  ylab(expression(bold(Mean~speed~(km/day)))) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.title.y = element_text(size=6, family = "sans", face = "bold"),
-        axis.title.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
-        axis.text.y = element_text(size=5, family = "sans"),
-        axis.text.x  = element_text(size=5, family = "sans", face = "bold", color = "black"),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=6, family = "sans", face = "bold", color = "black"),
         plot.title = element_text(hjust = -0.05, size = 10, family = "sans", face = "bold"),
         #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
         strip.background = element_blank(),
@@ -129,14 +132,14 @@ C <-
   scale_fill_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   scale_colour_manual(values = c("#fca311", "#14213d"), labels = c("Female", "Male")) +
   xlab(expression(bold(Age~(years))))+
-  ylab(expression(bold(Mean~movement~speed~(km/day)))) +
+  ylab(expression(bold(Mean~speed~(km/day)))) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.title.y = element_text(size=6, family = "sans", face = "bold"),
-        axis.title.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
-        axis.text.y = element_text(size=5, family = "sans"),
-        axis.text.x  = element_text(size=5, family = "sans", face = "bold", color = "black"),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=6, family = "sans", face = "bold", color = "black"),
         plot.title = element_text(hjust = -0.05, size = 10, family = "sans", face = "bold"),
         #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
         strip.background = element_blank(),
@@ -165,7 +168,7 @@ D <-
   ggtitle("D") +
   geom_bar(position="fill") +
     scale_fill_manual(breaks = c("0","1"),
-                      labels = c("Resting","Moving"),
+                      labels = c("Resting","Active"),
                       values = c("#81b29a", "#e07a5f"), 
                       name = "Activity",
                       na.value = NA) +
@@ -217,7 +220,7 @@ E <-
                       values = c("#004b23", "#001524", "#168aad", "#99d98c","#023e8a","#e9c46a"), 
                       name = "Land Class",
                       na.value = NA) +
-  ylab(expression(bold(Instantaneous~movement~speed~(m/s)))) +
+  ylab(expression(bold(Instantaneous~speed~(m/s)))) +
   theme_bw() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -270,3 +273,135 @@ ggsave(FIG,
        file="figures/speed_figure.png")
 
 
+
+
+#-------------------------------------------------------------
+# Figure S2 - Histogram of instantaneous movement speeds
+#-------------------------------------------------------------
+
+
+
+speed_gamma <- fitdist(moving_speeds$est, "gamma")
+
+
+A <- 
+  denscomp(list(speed_gamma), addlegend = F, plotstyle = "ggplot", fitcol = "#e36414", fitlwd = 0.8) +
+  xlab(expression(bold(Instantaneous~speed~(m/s)))) +
+  ggtitle("A") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=8, family = "sans", face = "bold"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 10, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "none",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm")) +
+    scale_x_continuous(expand = c(0,0.05)) +
+    scale_y_continuous(expand = c(0,.1))
+
+B <- 
+qqcomp(list(speed_gamma), addlegend = F, plotstyle = "ggplot", fitcol = "#e36414", fitlwd = 0.8) +
+  ggtitle("B") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=8, family = "sans", face = "bold"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 10, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "none",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm")) +
+  scale_x_continuous(limits = c(0,1), expand = c(0,0.1)) +
+  scale_y_continuous(limits = c(0,1), expand = c(0,0.1))
+
+C <-
+  cdfcomp(list(speed_gamma), addlegend = F, plotstyle = "ggplot", fitcol = "#e36414", fitlwd = 0.8) +
+  ggtitle("C") +
+  xlab(expression(bold(Instantaneous~speed~(m/s)))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=8, family = "sans", face = "bold"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 10, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "none",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm")) +
+  scale_x_continuous(limits = c(0,1), expand = c(0,0.02)) +
+  scale_y_continuous(limits = c(0,1), expand = c(0,0.02))
+
+
+D <- 
+  ppcomp(list(speed_gamma), addlegend = F, plotstyle = "ggplot", fitcol = "#e36414", fitlwd = 0.8) +
+  ggtitle("D") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=8, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=8, family = "sans", face = "bold"),
+        axis.text.y = element_text(size=6, family = "sans"),
+        axis.text.x  = element_text(size=8, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 10, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "none",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm")) +
+  scale_x_continuous(limits = c(0,1), expand = c(0,0.1)) +
+  scale_y_continuous(limits = c(0,1), expand = c(0,0.1))
+
+
+
+FIG <-
+  ggarrange(A, B, C, D,
+            ncol=2,
+            nrow=2)
+
+
+#Save the figures
+ggsave(FIG,
+       width = 6.86, height = 5, units = "in",
+       dpi = 600,
+       bg = "transparent",
+       file="figures/Figure_S2.png")

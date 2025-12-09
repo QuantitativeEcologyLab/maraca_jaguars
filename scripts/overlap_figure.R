@@ -146,3 +146,45 @@ FIG <-
 ggsave(FIG, filename = "figures/overlap_encounters.png",
        width = 6.86, height = 4.5, units = "in", dpi = 600)
 
+
+
+
+#-------------------------------------------------------------
+# Supplementary Figure S4 - Pairwise overlap
+#-------------------------------------------------------------
+
+
+#Colour pallet for the individual animals
+COLS <- c("#001427",
+          "#fca311",
+          "#ffd60a",
+          "#a34e97",
+          "#7400b8",
+          "#b85236",
+          "#c32f27",
+          "#f72585")
+
+names(COLS) <- c("Iara","ID696469B","ID696490B","ID717047B","Iemanja1","Iemanja2","Iranildo","Netuno")
+  
+
+png("figures/Figure_S4.png", width = 6.86*1.5, height = 10*1.5, units = "in", res = 600)
+
+
+par(mfrow = c(5,2))
+
+for(i in 1:nrow(pairs)){
+plot(DATA[c(pairs$jag_1[i], pairs$jag_2[i])],
+  UD = AKDEs[c(pairs$jag_1[i], pairs$jag_2[i])],
+  # col = c(ifelse(meta_data[meta_data[,"ID"] == pairs$jag_1[i],"sex"] == "male", "#fca311", "#14213d"),
+  #            ifelse(meta_data[meta_data[,"ID"] == pairs$jag_2[i],"sex"] == "male", "#fca311", "#14213d")),
+  
+  col = c(COLS[pairs$jag_1[i]], COLS[pairs$jag_2[i]]),
+     col.UD = c(ifelse(meta_data[meta_data[,"ID"] == pairs$jag_1[i],"sex"] == "male", "#fca311", "#14213d"),
+                ifelse(meta_data[meta_data[,"ID"] == pairs$jag_2[i],"sex"] == "male", "#fca311", "#14213d")),
+     main = paste(pairs$jag_1[i], " - ", pairs$jag_2[i], "; Overlap = ", round(pairs[i,"overlap"],3), sep = ""),
+     col.bg="transparent",
+     col.grid="transparent",
+     level=NA,
+  labels = NA)
+}
+dev.off()
