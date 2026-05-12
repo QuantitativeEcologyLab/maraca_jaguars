@@ -1,13 +1,14 @@
+#-------------------------------------------------------------
+# Workspace and data preparation
+#-------------------------------------------------------------
+
 library(ctmm)
 library(terra)
 library(weights)
 
-#-------------------------------------------------------------
-# Data import and pre-processing
-#-------------------------------------------------------------
 
-source("scripts/data_import.R")
-source("scripts/functions.R")
+source("scripts/01_data_import.R")
+
 
 #-------------------------------------------------------------
 # Extract land use
@@ -76,7 +77,7 @@ write.table(res,
 
 
 #-------------------------------------------------------------
-# Figure S3 - Proportion of HR PDF in the different habitats
+# Figure S5 - Proportion of HR PDF in the different habitats
 #-------------------------------------------------------------
 
 res_long <- reshape(
@@ -87,11 +88,11 @@ res_long <- reshape(
   timevar = "Habitat",
   times = names(res[,2:7])[names(res[,2:7]) != "ID"]
 )
-row.names(res_long) <- NULL; res_long[,4] <- NULL
+row.names(res_long) <- NULL; res_long[,"id"] <- NULL
 res_long$Value <- as.numeric(res_long$Value)
 
 #Generate the figure
-S3 <-
+S5 <-
   ggplot(data = res_long, aes(x = Habitat,
                                    y = Value,
                                    col = Habitat,
@@ -132,9 +133,9 @@ S3 <-
 
 
 #Save the figures
-ggsave(S3,
+ggsave(S5,
        width = 6.86, height = 4, units = "in",
        dpi = 600,
        bg = "transparent",
-       file="figures/Figure_S3.png")
+       file="figures/figure_S5.png")
 

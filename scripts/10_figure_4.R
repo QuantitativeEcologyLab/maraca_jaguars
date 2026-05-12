@@ -7,7 +7,7 @@ library(fitdistrplus)
 #-------------------------------------------------------------
 # Data import and pre-processing
 #-------------------------------------------------------------
-source("scripts/data_import.R")
+source("scripts/01_data_import.R")
 
 #Extract speed, for each animal
 meta_data$speed_est <- NA
@@ -24,7 +24,7 @@ moving_speeds <- na.omit(speed_df[speed_df$active == 1,])
 
 
 #-------------------------------------------------------------
-# Panel A - Boxplot of speed size vs sex
+# Panel A - Boxplot of speed vs sex
 #-------------------------------------------------------------
 
 
@@ -64,7 +64,7 @@ A <-
 
 
 #-------------------------------------------------------------
-# Panel B - Scatterplot of speed size vs weight
+# Panel B - Scatterplot of speed vs weight
 #-------------------------------------------------------------
 
 #Generate the figure
@@ -240,14 +240,7 @@ E <-
         legend.spacing.y = unit(0.2, 'cm'),
         panel.background = element_rect(fill = "transparent"),
         plot.background = element_rect(fill = "transparent", color = NA),
-        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm")) #+ 
-  # scale_y_log10() +
-  # annotation_logticks(sides="l",
-  #                     outside = F,
-  #                     linewidth = 0.2,
-  #                     short = unit(0.05, "cm"),
-  #                     mid = unit(0.05, "cm"),
-  #                     long = unit(0.1, "cm"))
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm"))
 
 
 
@@ -270,13 +263,13 @@ ggsave(FIG,
        width = 6.86, height = 7, units = "in",
        dpi = 600,
        bg = "transparent",
-       file="figures/speed_figure.png")
+       file="figures/figure_4.png")
 
 
 
 
 #-------------------------------------------------------------
-# Figure S2 - Histogram of instantaneous movement speeds
+# Figure S4 - Histogram of instantaneous movement speeds
 #-------------------------------------------------------------
 
 
@@ -404,4 +397,4 @@ ggsave(FIG,
        width = 6.86, height = 5, units = "in",
        dpi = 600,
        bg = "transparent",
-       file="figures/Figure_S2.png")
+       file="figures/figure_S4.png")

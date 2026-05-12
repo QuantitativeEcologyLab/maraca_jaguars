@@ -2,8 +2,13 @@
 library(ggplot2)
 library(metafor)
 library(scico)
+library(mgcv)
+library(tidyterra)
+library(ggspatial)
+library(gratia)
+library(gridExtra)
 
-source("scripts/data_import.R")
+source("scripts/01_data_import.R")
 
 # First build dataset of observed locations
 
@@ -13,14 +18,14 @@ for(i in 1:length(DATA)){
   #First build a dataframe with coordinates and individual ID 
   rsf_df_i <- data.frame(ID = DATA[[i]]@info$identity,
                          x = DATA[[i]]$x,
-                         y = DATA[[i]]$x)
+                         y = DATA[[i]]$y)
   
   #Then get habitat information
   cilla_sf <- as.sf(DATA[[i]])
   rsf_df_i$forest <- extract(forest, cilla_sf)[,2]
   rsf_df_i$mangrove <- extract(mangrove, cilla_sf)[,2]
   rsf_df_i$wetland <- extract(wetland, cilla_sf)[,2]  
-  rsf_df_i$grassland <- extract(wetland, cilla_sf)[,2]
+  rsf_df_i$grassland <- extract(grassland, cilla_sf)[,2]
   rsf_df_i$dist_to_coast <- extract(dist_to_coast, cilla_sf)[,2]
   rsf_df_i$weight <- AKDEs[[i]]$weights
   rsf_df_i$detection <- 1
@@ -69,7 +74,6 @@ RSF <-
 summary(RSF)
 plot(RSF, pages = 1)
 
-
 #Then build a dataset for generating the predictions
 pred_df <- terra::as.data.frame(forest, xy = TRUE)[,c("x","y")]
 pred_df$forest <- extract(forest, pred_df[,c("x","y")])[,2]
@@ -112,7 +116,6 @@ A <-
   ggtitle("A") +
   geom_spatraster(data = rsf_map, maxcell = 5e+07,
                   alpha = 0.9, aes(fill = lambda)) +
-  
   geom_spatvector(data = maraca, col = "black", size = 0.1, fill = "transparent") +
   
   scale_fill_scico(palette = 'batlow',
@@ -203,7 +206,7 @@ pred_df$lambda <- pred_df$lambda/max(pred_df$lambda)
 
 #Generate the figure
 B <-
-ggplot() +
+  ggplot() +
   ggtitle("B") +
   geom_line(data = pred_df,
             aes(x = dist_to_coast,
@@ -250,10 +253,10 @@ ggplot() +
 
 
 FIG <-
-  ggarrange(A, B,
-            ncol=1,
-            nrow=2,
-            heights = c(1.25,0.75))
+  ggpubr::ggarrange(A, B,
+                    ncol=1,
+                    nrow=2,
+                    heights = c(1.25,0.75))
 
 
 #Save the figures
@@ -261,4 +264,185 @@ ggsave(FIG,
        width = 3.23, height = 6, units = "in",
        dpi = 600,
        bg = "transparent",
-       file="figures/rsf_figure.png")
+       file="figures/figure_6.png")
+
+
+
+#-------------------------------------------------------------
+# Plot of RSF smooth terms
+#-------------------------------------------------------------
+
+
+#Create a log-scaled term and refit the model for plotting purposes
+#This gets around a bug in gratia
+rsf_df$log_dist_to_coast <- log(rsf_df$dist_to_coast+1)
+
+#Fit the RSF
+RSF <-
+  bam(detection ~
+        s(ID, bs = 're') +
+        s(log_dist_to_coast,k = 5) +
+        s(log_dist_to_coast, forest, bs = "sz") +
+        s(log_dist_to_coast, mangrove, bs = "sz") +
+        s(log_dist_to_coast, wetland, bs = "sz") +
+        s(log_dist_to_coast, grassland, bs = "sz"),
+      family = poisson(link = 'log'), 
+      data = rsf_df,  
+      weights = weight,
+      method = 'fREML',
+      discrete = TRUE)
+
+gratia::draw(RSF)
+
+
+
+sm <- smooth_estimates(RSF, select = "s(log_dist_to_coast,forest)") |> 
+  add_confint()
+
+A <- 
+ggplot(sm, aes(x = log_dist_to_coast, y = .estimate, 
+               fill = factor(forest), colour = factor(forest))) +
+  ggtitle("A") +
+  #geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), colour = "transparent", alpha = 0.3) +
+  geom_line() +
+  scale_fill_manual(values = c("#004b23", "grey80"), labels = c("Forest", "Non-forest")) +
+  scale_colour_manual(values = c("#004b23", "grey80"), labels = c("Forest", "Non-forest")) +
+  xlab(expression(bold(log(Distance~to~coast)))) +
+  ylab(expression(bold(Partial~effect))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=6, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=5, family = "sans"),
+        axis.text.x  = element_text(size=5, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 8, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm")) +
+  coord_cartesian(ylim = c(-2,2))
+
+
+sm_mangrove <- smooth_estimates(RSF, select = "s(log_dist_to_coast,mangrove)") |> 
+  add_confint()
+B <- 
+  ggplot(sm_mangrove, aes(x = log_dist_to_coast, y = .estimate, 
+                 fill = factor(mangrove), colour = factor(mangrove))) +
+  ggtitle("B") +
+  #geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), colour = "transparent", alpha = 0.3) +
+  geom_line() +
+  scale_fill_manual(values = c("#001524", "grey80"), labels = c("Mangrove", "Non-mangrove")) +
+  scale_colour_manual(values = c("#001524", "grey80"), labels = c("Mangrove", "Non-mangrove")) +
+  xlab(expression(bold(log(Distance~to~coast)))) +
+  ylab(expression(bold(Partial~effect))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=6, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=5, family = "sans"),
+        axis.text.x  = element_text(size=5, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 8, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm"))  +
+  coord_cartesian(ylim = c(-2,2))
+
+
+sm_grassland <- smooth_estimates(RSF, select = "s(log_dist_to_coast,grassland)") |> 
+  add_confint()
+C <- 
+  ggplot(sm_grassland, aes(x = log_dist_to_coast, y = .estimate, 
+                          fill = factor(grassland), colour = factor(grassland))) +
+  ggtitle("C") +
+  #geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), colour = "transparent", alpha = 0.3) +
+  geom_line() +
+  scale_fill_manual(values = c("#99d98c", "grey80"), labels = c("Grassland", "Non-grassland")) +
+  scale_colour_manual(values = c("#99d98c", "grey80"), labels = c("Grassland", "Non-grassland")) +
+  xlab(expression(bold(log(Distance~to~coast)))) +
+  ylab(expression(bold(Partial~effect))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=6, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=5, family = "sans"),
+        axis.text.x  = element_text(size=5, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 8, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm"))  +
+  coord_cartesian(ylim = c(-2,2))
+
+
+
+sm_wetland <- smooth_estimates(RSF, select = "s(log_dist_to_coast,wetland)") |> 
+  add_confint()
+D <- 
+  ggplot(sm_wetland, aes(x = log_dist_to_coast, y = .estimate, 
+                           fill = factor(wetland), colour = factor(wetland))) +
+  ggtitle("D") +
+  #geom_ribbon(aes(ymin = .lower_ci, ymax = .upper_ci), colour = "transparent", alpha = 0.3) +
+  geom_line() +
+  scale_fill_manual(values = c("#168aad", "grey80"), labels = c("Wetland", "Non-wetland")) +
+  scale_colour_manual(values = c("#168aad", "grey80"), labels = c("Wetland", "Non-wetland")) +
+  xlab(expression(bold(log(Distance~to~coast)))) +
+  ylab(expression(bold(Partial~effect))) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.title.y = element_text(size=6, family = "sans", face = "bold"),
+        axis.title.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        axis.text.y = element_text(size=5, family = "sans"),
+        axis.text.x  = element_text(size=5, family = "sans", face = "bold", color = "black"),
+        plot.title = element_text(hjust = -0.05, size = 8, family = "sans", face = "bold"),
+        #strip.text.x = element_text(size=6, family = "sans", face = "bold", color = "black"),
+        strip.background = element_blank(),
+        strip.text.x = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank(),
+        legend.text = element_text(size=5, family = "sans", face = "bold"),
+        legend.background = element_rect(fill = "transparent"),
+        legend.key.size = unit(0.3, 'cm'),
+        legend.spacing.y = unit(0.2, 'cm'),
+        panel.background = element_rect(fill = "transparent"),
+        plot.background = element_rect(fill = "transparent", color = NA),
+        plot.margin = unit(c(0.2,0.1,0.2,0.2), "cm"))  +
+  coord_cartesian(ylim = c(-2,2))
+
+
+FIG <-
+  grid.arrange(A,B,C,D,
+               ncol=2,
+               nrow=2)
+
+
+ggsave(FIG, filename = "figures/figure_S6.png",
+       width = 6.86, height = 5.5, units = "in", dpi = 600)                    

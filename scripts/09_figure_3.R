@@ -2,12 +2,14 @@
 library(ggplot2)
 library(metafor)
 library(lubridate)
+library(gridExtra)
+library(ggpubr)
 
 #-------------------------------------------------------------
 # Data import and pre-processesing
 #-------------------------------------------------------------
 
-source("scripts/data_import.R")
+source("scripts/01_data_import.R")
 
 #Identify encounters and aggregate by day of year
 #set threshold of 100m
@@ -119,9 +121,6 @@ C <-
         axis.text.y = element_text(size=6, family = "sans"),
         axis.text.x  = element_text(size=6, family = "sans"),
         legend.position="none",
-        # legend.text = element_text(size=6, family = "sans", face = "bold"),
-        # legend.position = c(0.84, 0.2), #horizontal, vertical
-        # legend.key.height = unit(0.3, "cm"),
         legend.key = element_rect(fill = "transparent"),
         legend.background = element_rect(fill = "transparent"),
         panel.background = element_rect(fill = "transparent"),
@@ -143,14 +142,14 @@ FIG <-
             heights = c(1.2,0.8))
 
 
-ggsave(FIG, filename = "figures/overlap_encounters.png",
+ggsave(FIG, filename = "figures/figure_3.png",
        width = 6.86, height = 4.5, units = "in", dpi = 600)
 
 
 
 
 #-------------------------------------------------------------
-# Supplementary Figure S4 - Pairwise overlap
+# Supplementary Figure S3 - Pairwise overlap
 #-------------------------------------------------------------
 
 
@@ -167,7 +166,7 @@ COLS <- c("#001427",
 names(COLS) <- c("Iara","ID696469B","ID696490B","ID717047B","Iemanja1","Iemanja2","Iranildo","Netuno")
   
 
-png("figures/Figure_S4.png", width = 6.86*1.5, height = 10*1.5, units = "in", res = 600)
+png("figures/figure_S3.png", width = 6.86*1.5, height = 10*1.5, units = "in", res = 600)
 
 
 par(mfrow = c(5,2))
@@ -175,11 +174,8 @@ par(mfrow = c(5,2))
 for(i in 1:nrow(pairs)){
 plot(DATA[c(pairs$jag_1[i], pairs$jag_2[i])],
   UD = AKDEs[c(pairs$jag_1[i], pairs$jag_2[i])],
-  # col = c(ifelse(meta_data[meta_data[,"ID"] == pairs$jag_1[i],"sex"] == "male", "#fca311", "#14213d"),
-  #            ifelse(meta_data[meta_data[,"ID"] == pairs$jag_2[i],"sex"] == "male", "#fca311", "#14213d")),
-  
   col = c(COLS[pairs$jag_1[i]], COLS[pairs$jag_2[i]]),
-     col.UD = c(ifelse(meta_data[meta_data[,"ID"] == pairs$jag_1[i],"sex"] == "male", "#fca311", "#14213d"),
+     col.DF = c(ifelse(meta_data[meta_data[,"ID"] == pairs$jag_1[i],"sex"] == "male", "#fca311", "#14213d"),
                 ifelse(meta_data[meta_data[,"ID"] == pairs$jag_2[i],"sex"] == "male", "#fca311", "#14213d")),
      main = paste(pairs$jag_1[i], " - ", pairs$jag_2[i], "; Overlap = ", round(pairs[i,"overlap"],3), sep = ""),
      col.bg="transparent",

@@ -10,7 +10,7 @@ library(terra)
 meta_data <- read.csv("data/jaguar_metadata.csv")
 
 #-------------------------------------------------------------
-# Tracking data import and pre-processesing
+# Tracking data import and pre-processing
 #-------------------------------------------------------------
 
 #Import Tracking data (while removing outliers)
@@ -79,7 +79,6 @@ agriculture <- project(agriculture,
 
 #Convert the categories to labels (some comparable and rare land classes are merged)
 # Details on the key are available here: https://brasil.mapbiomas.org/wp-content/uploads/sites/4/2024/10/Legenda-Colecao-9-LEGEND-CODE_v2.pdf 
-#levels(maraca_land) <- data.frame(ID = c(3,5,6,9,11,12,33,41), category = c(3,5,6,9,11,12,33,41))
 maraca_land <- ifel(maraca_land %in% c(3,6,9), 3, maraca_land)
 levels(maraca_land) <- data.frame(ID = c(3,
                                          5,
@@ -112,11 +111,10 @@ r <- rasterize(maraca, r)
 r[is.na(r)] <- 2
 r[r == 1] <- NA
 dist_to_coast <- distance(r)
-#dist_to_coast <- crop(dist_to_coast, maraca, mask = T)
 rm(r)
 
 #-------------------------------------------------------------
-# Import the movement movement metrics
+# Import the movement metrics
 #-------------------------------------------------------------
 
 #Movement models
@@ -129,21 +127,20 @@ if(file.exists("results/jaguar_akdes.Rda")) {load("results/jaguar_akdes.Rda")}
 if(file.exists("results/jaguar_speeds.Rda")) {load("results/jaguar_speeds.Rda")}
 
 #Instantaneous movement speeds
-if(file.exists("data/jaguar_speeds.csv")) {speed_df <- read.csv("data/jaguar_speeds.csv")}
-speed_df$ID <- as.factor(speed_df$ID)
+if(file.exists("data/jaguar_speeds.csv")) {speed_df <- read.csv("data/jaguar_speeds.csv"); speed_df$ID <- as.factor(speed_df$ID)}
 
 #Separation distances
 if(file.exists("results/distance_df.Rda")) {load("results/distance_df.Rda")}
 
-#Overlap and encounter nestimates
+#Overlap and encounter estimates
 if(file.exists("results/jaguar_overlap.csv")) {pairs <- read.csv("results/jaguar_overlap.csv")}
 
 #-------------------------------------------------------------
 # Import the tide data
 #-------------------------------------------------------------
 
-# #Import and process the tide data
-tide <- rast("data/environment/cmems_mod_glo_phy_anfc_merged-sl_PT1H-i_1750382952624.nc")
+#Import and process the tide data
+tide <- rast("data/environment/spatial_tide_data.nc")
 tide <- data.frame(time = time(tide),
                    masl = global(tide, fun = "mean", na.rm = TRUE)[,1])
 tide$timestamp <- as.POSIXct(tide$time, format = "%Y-%m-%d %H:%M:%OS", tz = "America/Sao_Paulo")

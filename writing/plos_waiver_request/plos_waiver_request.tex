@@ -1,0 +1,100 @@
+\documentclass{article}
+
+\usepackage[dvinames]{xcolor}
+% Measurements are taken directly from the guide
+\usepackage[top=1.7in,left=1in,bottom=1in,right=1in]{geometry}
+\usepackage{graphicx}
+\usepackage[colorlinks=true,
+            pdfborder={0 0 0},
+            ]{hyperref}
+\usepackage{lipsum}
+\usepackage[absolute]{textpos}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\usepackage{wrapfig} %For creating figs that can be wrapped into the text
+
+% No paragraph indentation
+\parindent0pt
+\setlength{\parskip}{0.8\baselineskip}
+\raggedright
+\pagestyle{empty}
+% Define SI official colors
+\definecolor{UBC_blue}{RGB}{13,40,86}
+\definecolor{SIgray}{HTML}{5e6a71}
+% Ensure consistency in the footer
+\urlstyle{rm}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyhead{}
+\fancyfoot[C]{ \thepage}
+
+\setcounter{page}{1}
+\renewcommand{\thepage}{Noonan, Cover Letter--- \arabic{page}}
+
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[L]{%
+    {\footnotesize\color{SIgray}
+Department of Biology, Irving K. Barber Faculty of Science, University of British Columbia, Kelowna, B.C., Canada \\[-0.1\baselineskip]
+T: 1(250) 258-1118  $\mid$  \href{mailto:michael.noonan@ubc.ca}{michael.noonan@ubc.ca} $\mid$ \url{https://biology.ok.ubc.ca/about/contact/michael-j-noonan/}
+}\color{black}}
+
+
+
+\begin{document}
+
+% -------------------------------------------------------
+% Add logo, the text under the blue line, and the line itself
+\begin{textblock*}{2in}[0.3066,0.39](1.6in,1.05in)
+    \includegraphics[width=2in]{Lab_Logo_Trans.png}
+\end{textblock*}
+\begin{textblock*}{6.375in}(1.5in,1.1in)   % 6.375=8.5 - 1.5 - 0.625
+    \hfill \color{SIgray} Dr.~Michael Noonan, Assistant Professor\\
+    \hfill Department of Biology, UBC-Okanagan
+
+\end{textblock*}
+\begin{tikzpicture}[remember picture,overlay]
+    \draw[color=UBC_blue,line width=1pt] (current page.north west)+(1.05in,-1.6in) -- ($(-0.625in,-1.6in)+(current page.north east)$);
+\end{tikzpicture}
+
+
+\color{black}
+\vspace{20pt}
+\hfill Kelowna, Canada\\
+\hfill \today{}
+
+Dear PLOS ONE Editorial team,
+
+My co-authors and I are requesting a publication fee waiver on our manuscript entitled \emph{`Spatial Ecology of Jaguars in a Coastal Amazon Island Ecosystem'}, Manuscript ID: PONE-D-25-37116), which was first submitted to PLOS ONE on July 17, 2025.
+
+This work was funded by the Instituto Onça-Pintada / Jaguar Conservation Fund, a Brazilian non-governmental organisation that operates entirely on donations and does not have resources available to cover publication fees. The senior author, Dr Noonan, is based in the Department of Biology at the University of British Columbia, where their research funding is derived primarily from government contracts tied to specific projects and cannot be used to cover publication fees for unrelated work. As a result, the author team does not have access to funds to support article processing charges for this manuscript.
+
+When selecting a journal, we specifically chose PLOS ONE in light of the publication fee waiver agreement in place with the University of British Columbia. Unfortunately, this agreement is set to expire prior to the final acceptance of our manuscript.
+
+We note that the manuscript was originally submitted on July 17, 2025, and that the first decision was received on November 16, 2025—123 days after submission. This decision time substantially exceeds the average first decision time of approximately 43 days reported by PLOS ONE \url{https://journals.plos.org/plosone/s/editorial-and-peer-review-process}. During this period, we were informed on October 8, 2025 that the handling editor was no longer available, followed by confirmation nine days later that a new editor had been assigned (documentation attached). Our revision requests were relatively minor, and the revised manuscript was resubmitted promptly on December 11, 2025.
+
+Given that the delay in editorial handling extended the review process beyond the period covered by the UBC waiver agreement, we believe that, had the manuscript progressed within typical timelines, it would likely have been accepted before the agreement’s expiration. In light of these circumstances, we respectfully request that PLOS ONE consider granting a publication fee waiver for this manuscript.
+
+Thank you very much for your time and consideration. Please do not hesitate to contact us if any additional information would be helpful.
+
+\hfill \\
+
+Kind regards,
+\hfill \\
+\hfill \\
+\hfill \\
+Prof. Michael Noonan\\
+Assistant Professor,  \\
+The University of British Columbia, Okanagan \\
+Department of Biology, SCI 379,\\
+Kelowna, British Columbia,\\
+V1V 1V7, Canada\\
+Email: michael.noonan@ubc.ca  %\\
+%Phone: 250-258-1118\\
+
+
+\end{document}

@@ -13,8 +13,8 @@ library(gridExtra)
 # Data import and pre-processing
 #-------------------------------------------------------------
 
-source("scripts/data_import.R")
-source("scripts/functions.R")
+source("scripts/00_functions.R")
+source("scripts/01_data_import.R")
 
 #-------------------------------------------------------------
 # Movement modelling
@@ -49,7 +49,7 @@ for(i in 1:length(DATA)){
     
     #Save the best fit model
     #First get the best fit model if more than 1 have been fit
-    if(class(cilla.mods) == "list") {FIT <- cilla.mods[[1]]} else {
+    if(is.list(cilla.mods)) {FIT <- cilla.mods[[1]]} else {
       
       FIT <- cilla.mods
     }

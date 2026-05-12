@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.9.7)  19 JAN 2026 11:24
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.11)  17 AUG 2023 19:45
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**Maraca_Jaguars_Cover_Letter.tex
-(./Maraca_Jaguars_Cover_Letter.tex
+**Letter_Template.tex
+(./Letter_Template.tex
 LaTeX2e <2020-10-01> patch level 4
 L3 programming layer <2021-02-18>
 (/usr/local/texlive/2021/texmf-dist/tex/latex/base/article.cls
@@ -541,6 +541,14 @@ File: tikzlibrarytopaths.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 s/tikzlibrarycalc.code.tex
 File: tikzlibrarycalc.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 )
+(/usr/local/texlive/2021/texmf-dist/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen266
+\WF@size=\dimen267
+\c@WF@wrappedlines=\count288
+\WF@box=\box61
+\WF@everypar=\toks30
+Package: wrapfig 2003/01/31  v 3.6
+)
 (/usr/local/texlive/2021/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and foote
 rs
@@ -554,8 +562,8 @@ rs
 \f@nch@O@olf=\skip57
 \f@nch@O@orf=\skip58
 )
-(./Maraca_Jaguars_Cover_Letter.aux)
-\openout1 = `Maraca_Jaguars_Cover_Letter.aux'.
+No file Letter_Template.aux.
+\openout1 = `Letter_Template.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 48.
 LaTeX Font Info:    ... okay on input line 48.
@@ -575,20 +583,19 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 48.
 LaTeX Font Info:    ... okay on input line 48.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 48.
 LaTeX Font Info:    ... okay on input line 48.
-
 (/usr/local/texlive/2021/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count288
-\scratchdimen=\dimen266
-\scratchbox=\box61
-\nofMPsegments=\count289
-\nofMParguments=\count290
-\everyMPshowfont=\toks30
-\MPscratchCnt=\count291
-\MPscratchDim=\dimen267
-\MPnumerator=\count292
-\makeMPintoPDFobject=\count293
-\everyMPtoPDFconversion=\toks31
+\scratchcounter=\count289
+\scratchdimen=\dimen268
+\scratchbox=\box62
+\nofMPsegments=\count290
+\nofMParguments=\count291
+\everyMPshowfont=\toks31
+\MPscratchCnt=\count292
+\MPscratchDim=\dimen269
+\MPnumerator=\count293
+\makeMPintoPDFobject=\count294
+\everyMPtoPDFconversion=\toks32
 ) (/usr/local/texlive/2021/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -643,14 +650,13 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count294
+\c@section@level=\count295
 )
 LaTeX Info: Redefining \ref on input line 48.
 LaTeX Info: Redefining \pageref on input line 48.
 LaTeX Info: Redefining \nameref on input line 48.
- (./Maraca_Jaguars_Cover_Letter.out) (./Maraca_Jaguars_Cover_Letter.out)
 \@outlinefile=\write4
-\openout4 = `Maraca_Jaguars_Cover_Letter.out'.
+\openout4 = `Letter_Template.out'.
 
 <Lab_Logo_Trans.png, id=7, 340.3917pt x 132.2541pt>
 File: Lab_Logo_Trans.png Graphic file (type png)
@@ -658,36 +664,41 @@ File: Lab_Logo_Trans.png Graphic file (type png)
 Package pdftex.def Info: Lab_Logo_Trans.png  used on input line 53.
 (pdftex.def)             Requested size: 144.54pt x 56.15779pt.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 75.
+(Font)              <8> on input line 89.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 75.
+(Font)              <6> on input line 89.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 91.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 91.
+(Font)              <5> on input line 89.
+ [1{/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
-[1{/usr/local/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+ <./Lab_Logo_Trans.png>] (./Letter_Template.aux)
 
- <./Lab_Logo_Trans.png>] (./Maraca_Jaguars_Cover_Letter.aux)
-Package rerunfilecheck Info: File `Maraca_Jaguars_Cover_Letter.out' has not cha
-nged.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `Letter_Template.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `Letter_Template.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 19045 strings out of 478994
- 354947 string characters out of 5858185
- 727386 words of memory out of 5000000
- 36210 multiletter control sequences out of 15000+600000
+ 19104 strings out of 478994
+ 355522 string characters out of 5858184
+ 725310 words of memory out of 5000000
+ 36271 multiletter control sequences out of 15000+600000
  405253 words of font info for 33 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 87i,12n,88p,1096b,467s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 87i,12n,88p,417b,467s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb>
 </usr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></u
 sr/local/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-Output written on Maraca_Jaguars_Cover_Letter.pdf (1 page, 79133 bytes).
+Output written on Letter_Template.pdf (1 page, 74406 bytes).
 PDF statistics:
- 34 PDF objects out of 1000 (max. 8388607)
- 25 compressed objects within 1 object stream
+ 33 PDF objects out of 1000 (max. 8388607)
+ 24 compressed objects within 1 object stream
  2 named destinations out of 1000 (max. 500000)
  18 words of extra memory for PDF output out of 10000 (max. 10000000)
 

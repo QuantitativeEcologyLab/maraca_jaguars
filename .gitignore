@@ -51,3 +51,4 @@ rsconnect/
 # Specific folders to ignore
 
 data/gps
+.positai

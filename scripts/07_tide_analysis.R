@@ -9,18 +9,7 @@ library(ggpubr)
 library(mgcv)
 library(lubridate)
 
-source("scripts/data_import.R")
-
-
-#Colour pallet for the individual animals
-COLS <- c("#001427",
-          "#fca311",
-          "#ffd60a",
-          "#a34e97",
-          "#7400b8",
-          "#b85236",
-          "#c32f27",
-          "#f72585")
+source("scripts/01_data_import.R")
 
 #-------------------------------------------------------------
 # Distance to coast vs sea level
@@ -139,14 +128,7 @@ B <-
         panel.background = element_rect(fill = "transparent"),
         plot.background = element_rect(fill = "transparent", color = NA),
         plot.margin = unit(c(0,0.1,0,0.1), "cm")) +
-  scale_y_continuous(expand = c(0,30)) #+ 
-scale_y_log10() +
-  annotation_logticks(sides="l",
-                      outside = T,
-                      linewidth = 0.2,
-                      short = unit(0.05, "cm"),
-                      mid = unit(0.05, "cm"),
-                      long = unit(0.1, "cm"))
+  scale_y_continuous(expand = c(0,30))
 
 
 C <- 
@@ -185,14 +167,7 @@ C <-
         panel.background = element_rect(fill = "transparent"),
         plot.background = element_rect(fill = "transparent", color = NA),
         plot.margin = unit(c(0,0.1,0,0.1), "cm")) +
-  scale_y_continuous(expand = c(0,30)) #+ 
-scale_y_log10() +
-  annotation_logticks(sides="l",
-                      outside = T,
-                      linewidth = 0.2,
-                      short = unit(0.05, "cm"),
-                      mid = unit(0.05, "cm"),
-                      long = unit(0.1, "cm"))
+  scale_y_continuous(expand = c(0,30))
 
 
 
@@ -202,7 +177,7 @@ FIG <-
             nrow=1)
 
 ggsave(FIG,
-       file="figures/sea_level.png",
+       file="figures/figure_7.png",
        width = 6.46,
        height=2,
        units = "in",
